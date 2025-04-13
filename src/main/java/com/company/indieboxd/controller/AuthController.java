@@ -3,7 +3,6 @@ package com.company.indieboxd.controller;
 import com.company.indieboxd.model.User;
 import com.company.indieboxd.service.SessionService;
 import com.company.indieboxd.service.UserService;
-import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
