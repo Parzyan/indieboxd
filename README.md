@@ -1,0 +1,1 @@
+IndieBoxd is a web-based platform that serves as a hub for independent filmmakers and film enthusiasts. It combines elements of: Streaming (hosting short films & indie movies), Crowdfunding (supporting creators via donations), Community & Discovery (user reviews, ratings) 
