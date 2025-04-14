@@ -23,6 +23,11 @@ public class Movie {
     @Column(name = "image_url")
     private String imageUrl;
 
+    private double rating;
+
+    @Column(name = "review_count")
+    private double reviewCount;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
@@ -30,10 +35,12 @@ public class Movie {
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Review> reviews = new ArrayList<>();
 
-    // Constructors
-    public Movie() {}
+    public Movie() {
+        this.rating = 0;
+        this.reviewCount = 0;
+    }
 
-    public Movie(String title, String director, String genre, Integer duration,
+    public Movie(String title, String genre, Integer duration,
                  Integer releaseYear, String imageUrl, User user) {
         this.title = title;
         this.genre = genre;
@@ -41,6 +48,8 @@ public class Movie {
         this.releaseYear = releaseYear;
         this.imageUrl = imageUrl;
         this.user = user;
+        this.rating = 0;
+        this.reviewCount = 0;
     }
 
     public Long getId() {
@@ -101,5 +110,21 @@ public class Movie {
 
     public void setReviews(List<Review> reviews) {
         this.reviews = reviews;
+    }
+
+    public double getRating() {
+        return rating;
+    }
+
+    public void setRating(double rating) {
+        this.rating = rating;
+    }
+
+    public double getReviewCount() {
+        return reviewCount;
+    }
+
+    public void setReviewCount(double reviewCount) {
+        this.reviewCount = reviewCount;
     }
 }
