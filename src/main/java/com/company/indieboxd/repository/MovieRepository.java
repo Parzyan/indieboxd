@@ -1,6 +1,7 @@
 package com.company.indieboxd.repository;
 
 import com.company.indieboxd.model.Movie;
+import com.company.indieboxd.model.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,6 +12,7 @@ import java.util.List;
 public interface MovieRepository extends JpaRepository<Movie, Long> {
     List<Movie> findByUser_Id(Long userId);
     List<Movie> findByTitleContainingIgnoreCase(String title);
+    List<Movie> findByUser(User user);
 
     Page<Movie> findByGenre(String genre, Pageable pageable);
 

@@ -1,12 +1,15 @@
 package com.company.indieboxd.service;
 
 import com.company.indieboxd.model.Movie;
+import com.company.indieboxd.model.Review;
+import com.company.indieboxd.model.User;
 import com.company.indieboxd.repository.MovieRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -27,6 +30,18 @@ public class MovieService {
     public Movie getMovieById(Long id) {
         Optional<Movie> movie = movieRepository.findById(id);
         return movie.orElseThrow(() -> new RuntimeException("Movie not found"));
+    }
+
+    @Transactional
+    public void updateMovieRating(Long movieId, double rating) {
+        Movie movie = movieRepository.findById(movieId)
+                .orElseThrow(() -> new IllegalArgumentException("Movie not found"));
+        double currentRating = movie.getRating();
+        double currentRatingCount = movie.getReviewCount();
+        movie.setReviewCount(currentRatingCount + 1);
+        movie.setRating(currentRating + rating);
+
+        movieRepository.save(movie);
     }
 
     public void saveMovie(Movie movie) {
@@ -66,5 +81,9 @@ public class MovieService {
             default:
                 return Sort.by("releaseYear").descending();
         }
+    }
+
+    public List<Movie> findMoviesByUser(User user) {
+        return movieRepository.findByUser(user);
     }
 }

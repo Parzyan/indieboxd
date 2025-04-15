@@ -93,6 +93,44 @@
             color: #e2e8f0;
             margin-bottom: 1rem;
         }
+
+        .nav-tabs .nav-link {
+            color: #64748b;
+            font-weight: 500;
+            border: none;
+            padding: 0.75rem 1.5rem;
+        }
+
+        .nav-tabs .nav-link.active {
+            color: #6366f1;
+            border-bottom: 3px solid #6366f1;
+            background: transparent;
+        }
+
+        .tab-content {
+            padding: 1.5rem 0;
+        }
+
+        .review-item {
+            border-left: 3px solid #6366f1;
+            padding-left: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .review-movie {
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .review-rating {
+            color: #f59e0b;
+            font-weight: 500;
+        }
+
+        .review-date {
+            color: #64748b;
+            font-size: 0.85rem;
+        }
     </style>
 </head>
 <body>
@@ -131,11 +169,11 @@
 
                 <div class="profile-stats">
                     <div class="stat-item">
-                        <div class="stat-value" th:text="0">0</div>
+                        <div class="stat-value" th:text="${movies.size()}">0</div>
                         <div class="stat-label">Movies</div>
                     </div>
                     <div class="stat-item">
-                        <div class="stat-value" th:text="0">0</div>
+                        <div class="stat-value" th:text="${reviews.size()}">0</div>
                         <div class="stat-label">Reviews</div>
                     </div>
                     <div class="stat-item">
@@ -154,56 +192,130 @@
                 </div>
             </div>
         </div>
+
         <div class="col-lg-8">
             <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h4 class="mb-0">Your Movies</h4>
-                    <div class="dropdown">
-                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle"
-                                type="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-filter me-1"></i> Filter
-                        </button>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#">All Movies</a></li>
-                            <li><a class="dropdown-item" href="#">Favorites</a></li>
-                            <li><a class="dropdown-item" href="#">Recently Added</a></li>
-                        </ul>
-                    </div>
-                </div>
-                <!--<div class="card-body">
-                    <div th:if="${movies.empty}" class="empty-state">
-                        <i class="fas fa-film"></i>
-                        <h5>No movies yet</h5>
-                        <p>You haven't added any movies to your collection.</p>
-                        <a href="/movies/add" class="btn btn-primary mt-2">
-                            <i class="fas fa-plus me-2"></i> Add Your First Movie
-                        </a>
-                    </div>
+                <div class="card-body">
+                    <ul class="nav nav-tabs" id="profileTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="movies-tab" data-bs-toggle="tab"
+                                    data-bs-target="#movies" type="button" role="tab">
+                                <i class="fas fa-film me-1"></i> Movies
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="favorites-tab" data-bs-toggle="tab"
+                                    data-bs-target="#favorites" type="button" role="tab">
+                                <i class="fas fa-heart me-1"></i> Favorites
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="reviews-tab" data-bs-toggle="tab"
+                                    data-bs-target="#reviews" type="button" role="tab">
+                                <i class="fas fa-star me-1"></i> Reviews
+                            </button>
+                        </li>
+                    </ul>
 
-                    <div th:each="movie : ${movies}" class="movie-card">
-                        <img th:src="${movie.posterUrl ?: '/images/default-movie.jpg'}"
-                             class="movie-poster"
-                             th:alt="${movie.title + ' poster'}">
-                        <div class="movie-details">
-                            <h5 th:text="${movie.title}">Movie Title</h5>
-                            <p class="text-muted small mb-2" th:text="${movie.year}">2023</p>
-                            <p class="small" th:text="${movie.shortDescription}">Short description...</p>
-                            <div class="movie-actions">
-                                <a th:href="@{'/movies/' + ${movie.id}}" class="btn btn-sm btn-outline-primary">
-                                    <i class="fas fa-eye"></i> View
+                    <div class="tab-content" id="profileTabsContent">
+                        <!-- Movies Tab -->
+                        <div class="tab-pane fade show active" id="movies" role="tabpanel">
+                            <div th:if="${movies.isEmpty()}" class="empty-state">
+                                <i class="fas fa-film"></i>
+                                <h5>No movies added yet</h5>
+                                <p class="text-muted">You haven't added any movies to your collection.</p>
+                                <a href="/movies/add" class="btn btn-primary mt-2">
+                                    <i class="fas fa-plus me-2"></i> Add Your First Movie
                                 </a>
-                                <a th:href="@{'/movies/edit/' + ${movie.id}}" class="btn btn-sm btn-outline-secondary">
-                                    <i class="fas fa-edit"></i> Edit
+                            </div>
+
+                            <div th:each="movie : ${movies}" class="movie-card">
+                                <img th:src="${movie.imageUrl ?: 'https://image.tmdb.org/t/p/w600_and_h900_bestv2/7IiTTgloJzvGI1TAYymCfbfl3vT.jpg'}"
+                                     class="movie-poster"
+                                     th:alt="${movie.title + ' poster'}">
+                                <div class="movie-details">
+                                    <h5 class="movie-title" th:text="${movie.title}"></h5>
+                                    <p class="text-muted small mb-2" th:text="${movie.releaseYear}"></p>
+                                    <p class="small" th:text="${movie.description}"></p>
+                                    <div class="movie-actions">
+                                        <a th:href="@{'/movies/' + ${movie.id}}" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye"></i> View
+                                        </a>
+                                        <form th:action="@{'/movies/delete/' + ${movie.id}}" method="post" class="d-inline">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                <i class="fas fa-trash"></i> Delete
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Favorites Tab -->
+                        <!--
+                        <div class="tab-pane fade" id="favorites" role="tabpanel">
+                            <div th:if="${favorites.empty}" class="empty-state">
+                                <i class="fas fa-heart"></i>
+                                <h5>No favorites yet</h5>
+                                <p class="text-muted">You haven't added any movies to your favorites.</p>
+                                <a href="/movies" class="btn btn-primary mt-2">
+                                    <i class="fas fa-film me-2"></i> Browse Movies
                                 </a>
-                                <form th:action="@{'/movies/delete/' + ${movie.id}}" method="post" class="d-inline">
-                                    <button type="submit" class="btn btn-sm btn-outline-danger">
-                                        <i class="fas fa-trash"></i> Delete
-                                    </button>
-                                </form>
+                            </div>
+
+                            <div th:each="movie : ${favorites}" class="movie-card">
+                                <img th:src="${movie.imageUrl ?: '/images/default-movie.jpg'}"
+                                     class="movie-poster"
+                                     th:alt="${movie.title + ' poster'}">
+                                <div class="movie-details">
+                                    <h5 class="movie-title" th:text="${movie.title}"></h5>
+                                    <p class="text-muted small mb-2" th:text="${movie.releaseYear}"></p>
+                                    <div class="movie-actions">
+                                        <a th:href="@{'/movies/' + ${movie.id}}" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye"></i> View
+                                        </a>
+                                        <form th:action="@{'/favorites/remove/' + ${movie.id}}" method="post" class="d-inline">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                <i class="fas fa-heart-broken"></i> Remove
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>-->
+
+                        <!-- Reviews Tab -->
+                        <div class="tab-pane fade" id="reviews" role="tabpanel">
+                            <div th:if="${reviews.isEmpty()}" class="empty-state">
+                                <i class="fas fa-star"></i>
+                                <h5>No reviews yet</h5>
+                                <p class="text-muted">You haven't reviewed any movies yet.</p>
+                            </div>
+
+                            <div th:each="review : ${reviews}" class="review-item">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <a th:href="@{'/movies/' + ${review.movie.id}}" class="review-movie">
+                                        <i class="fas fa-film me-1"></i>
+                                        <span th:text="${review.movie.title}"></span>
+                                    </a>
+                                    <div class="review-rating">
+                                        <span th:text="${review.rating}"></span>
+                                        <i class="fas fa-star"></i>
+                                    </div>
+                                </div>
+                                <p th:text="${review.content}"></p>
+                                <div class="review-date" th:text="${#temporals.format(review.createdAt, 'MMM dd, yyyy')}"></div>
+                                <div class="mt-2">
+                                    <form th:action="@{'/reviews/delete/' + ${review.id}}" method="post" class="d-inline">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                                            <i class="fas fa-trash"></i> Delete
+                                        </button>
+                                    </form>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>-->
+                </div>
             </div>
         </div>
     </div>

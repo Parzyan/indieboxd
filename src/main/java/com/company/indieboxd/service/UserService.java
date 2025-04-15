@@ -1,15 +1,21 @@
 package com.company.indieboxd.service;
 
+import com.company.indieboxd.model.Review;
 import com.company.indieboxd.model.User;
+import com.company.indieboxd.repository.ReviewRepository;
 import com.company.indieboxd.repository.UserRepository;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class UserService {
     private final UserRepository userRepository;
+    private final ReviewRepository reviewRepository;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, ReviewRepository reviewRepository) {
         this.userRepository = userRepository;
+        this.reviewRepository = reviewRepository;
         createAdminUser();
     }
 
@@ -58,5 +64,11 @@ public class UserService {
             return user;
         }
         return null;
+    }
+
+    public List<Review> getReviewsByUserId(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        return reviewRepository.findByUserId(user.getId());
     }
 }

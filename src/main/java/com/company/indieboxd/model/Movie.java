@@ -23,6 +23,7 @@ public class Movie {
     @Column(name = "image_url")
     private String imageUrl;
 
+    private String description;
     private double rating;
 
     @Column(name = "review_count")
@@ -41,13 +42,14 @@ public class Movie {
     }
 
     public Movie(String title, String genre, Integer duration,
-                 Integer releaseYear, String imageUrl, User user) {
+                 Integer releaseYear, String imageUrl, User user, String description) {
         this.title = title;
         this.genre = genre;
         this.duration = duration;
         this.releaseYear = releaseYear;
         this.imageUrl = imageUrl;
         this.user = user;
+        this.description = description;
         this.rating = 0;
         this.reviewCount = 0;
     }
@@ -127,4 +129,8 @@ public class Movie {
     public void setReviewCount(double reviewCount) {
         this.reviewCount = reviewCount;
     }
+
+    public String getDescription() { return description; }
+
+    public void setDescription(String description) { this.description = description; }
 }

@@ -1,15 +1,16 @@
 package com.company.indieboxd.controller;
 
 import com.company.indieboxd.model.Movie;
+import com.company.indieboxd.model.Review;
 import com.company.indieboxd.model.User;
 import com.company.indieboxd.service.MovieService;
+import com.company.indieboxd.service.ReviewService;
 import com.company.indieboxd.service.SessionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
@@ -20,11 +21,13 @@ public class MovieController {
 
     private final MovieService movieService;
     private final SessionService sessionService;
+    private final ReviewService reviewService;
 
     @Autowired
-    public MovieController(MovieService movieService, SessionService sessionService) {
+    public MovieController(MovieService movieService, SessionService sessionService, ReviewService reviewService) {
         this.movieService = movieService;
         this.sessionService = sessionService;
+        this.reviewService = reviewService;
     }
 
     @GetMapping("/add")
@@ -44,6 +47,7 @@ public class MovieController {
             @RequestParam(required = false) Integer releaseYear,
             @RequestParam(required = false) Integer duration,
             @RequestParam(required = false) String genre,
+            @RequestParam(required = false) String description,
             RedirectAttributes redirectAttributes) {
 
         User currentUser = sessionService.getCurrentUser();
@@ -54,6 +58,7 @@ public class MovieController {
         movie.setDuration(duration);
         movie.setGenre(genre);
         movie.setUser(currentUser);
+        movie.setDescription(description);
 
         movieService.saveMovie(movie);
 
@@ -98,16 +103,14 @@ public class MovieController {
         Movie movie = movieService.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Movie not found"));
 
-        boolean hasReviewed = false;
         User currentUser = sessionService.getCurrentUser();
-        if (currentUser != null) {
-            hasReviewed = movie.getReviews().stream()
-                    .anyMatch(r -> r.getUser().getId().equals(currentUser.getId()));
-        }
+        boolean hasReviewed = currentUser != null &&
+                reviewService.hasUserReviewedMovie(currentUser.getId(), id);
 
         model.addAttribute("movie", movie);
         model.addAttribute("hasReviewed", hasReviewed);
         model.addAttribute("user", currentUser);
-        return "moviepage";
+        if(currentUser == null) return "moviepage";
+        return "moviepage-logged";
     }
 }
