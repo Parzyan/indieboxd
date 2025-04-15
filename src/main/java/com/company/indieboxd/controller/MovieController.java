@@ -5,13 +5,14 @@ import com.company.indieboxd.model.User;
 import com.company.indieboxd.service.MovieService;
 import com.company.indieboxd.service.SessionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.security.Principal;
+import java.util.List;
 
 @Controller
 @RequestMapping("/movies")
@@ -68,5 +69,45 @@ public class MovieController {
         User user = sessionService.getCurrentUser();
         model.addAttribute("user", user);
         return "confirmation";
+    }
+
+    @GetMapping
+    public String listMovies(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(required = false) String genre,
+            @RequestParam(defaultValue = "newest") String sort,
+            Model model) {
+
+        Page<Movie> moviePage = movieService.findMovies(page, size, genre, sort);
+        List<String> allGenres = movieService.findAllGenres();
+
+        User user = sessionService.getCurrentUser();
+        model.addAttribute("movies", moviePage);
+        model.addAttribute("allGenres", allGenres);
+        model.addAttribute("selectedGenre", genre);
+        model.addAttribute("sort", sort);
+        model.addAttribute("user", user);
+        System.out.println(moviePage.isEmpty());
+        if(user == null) return "movies";
+        return "movies-logged";
+    }
+
+    @GetMapping("/{id}")
+    public String viewMovie(@PathVariable Long id, Model model) {
+        Movie movie = movieService.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Movie not found"));
+
+        boolean hasReviewed = false;
+        User currentUser = sessionService.getCurrentUser();
+        if (currentUser != null) {
+            hasReviewed = movie.getReviews().stream()
+                    .anyMatch(r -> r.getUser().getId().equals(currentUser.getId()));
+        }
+
+        model.addAttribute("movie", movie);
+        model.addAttribute("hasReviewed", hasReviewed);
+        model.addAttribute("user", currentUser);
+        return "moviepage";
     }
 }

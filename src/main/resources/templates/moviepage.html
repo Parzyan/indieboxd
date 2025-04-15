@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${movie.title + ' | IndieBoxd'}">Movie Details</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&family=Winky+Rough:wght@500&display=swap" rel="stylesheet">
+    <style>
+        .movie-detail-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+        }
+
+        .movie-header {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .movie-poster {
+            width: 300px;
+            height: 450px;
+            object-fit: cover;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .movie-info {
+            flex: 1;
+        }
+
+        .movie-title {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .movie-meta {
+            color: #64748b;
+            margin-bottom: 1.5rem;
+        }
+
+        .movie-rating {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .rating-stars {
+            color: #f59e0b;
+            font-size: 1.2rem;
+        }
+
+        .rating-value {
+            font-weight: 600;
+        }
+
+        .movie-actions {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .review-card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            margin-bottom: 1.5rem;
+            padding: 1.5rem;
+        }
+
+        .review-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .review-user {
+            font-weight: 600;
+            margin-right: 1rem;
+        }
+
+        .review-rating {
+            color: #f59e0b;
+        }
+
+        .review-date {
+            color: #64748b;
+            font-size: 0.9rem;
+            margin-left: auto;
+        }
+
+        .add-review-form {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            margin-top: 2rem;
+        }
+
+        .star-rating {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .star-rating i {
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: #e2e8f0;
+            transition: color 0.2s;
+        }
+
+        .star-rating i:hover,
+        .star-rating i.active {
+            color: #f59e0b;
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar">
+    <div class="container">
+        <a class="navbar-brand" href="/">
+            <i class="fas fa-film logo-icon"></i>
+            <span>IndieBoxd</span>
+        </a>
+        <div class="nav-links">
+            <a href="/" class="nav-link active">Home</a>
+            <a href="/movies" class="nav-link">Movies</a>
+            <a href="#" class="nav-link">About</a>
+            <a href="/auth/login" class="nav-link">Login</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container movie-detail-container">
+    <div class="movie-header">
+        <img th:src="${movie.imageUrl ?: '/images/default-movie.jpg'}"
+             class="movie-poster"
+             th:alt="${movie.title + ' poster'}">
+
+        <div class="movie-info">
+            <h1 class="movie-title" th:text="${movie.title}"></h1>
+
+            <div class="movie-meta">
+                <span th:text="${movie.releaseYear}"></span>
+                <span th:if="${movie.genre}"> • <span th:text="${movie.genre}"></span></span>
+                <span th:if="${movie.duration}"> • <span th:text="${movie.duration + ' min'}"></span></span>
+            </div>
+
+            <div class="movie-rating" th:if="0">
+                <div class="rating-stars">
+                    <i class="fas fa-star"></i>
+                    <span class="rating-value" th:text="0"></span>
+                </div>
+                <span class="text-muted" th:text="'(' + ${movie.reviews.size()} + ' reviews)'"></span>
+            </div>
+
+            <div class="mb-3">
+                <span class="text-muted">Added by: </span>
+                <a th:href="@{'/profile/' + ${movie.user.id}}" class="fw-bold">
+                    <i class="fas fa-user me-1"></i>
+                    <span th:text="${movie.user.username}"></span>
+                </a>
+            </div>
+
+            <div class="movie-actions">
+                <a th:href="@{'/movies/edit/' + ${movie.id}}" class="btn btn-outline-primary"
+                   th:if="${user.id == movie.user.id or user.isAdmin()}">
+                    <i class="fas fa-edit me-1"></i> Edit
+                </a>
+                <a th:href="@{'/movies/delete/' + ${movie.id}}" class="btn btn-outline-danger"
+                   th:if="${user.id == movie.user.id or user.isAdmin()}"
+                   onclick="return confirm('Are you sure you want to delete this movie?')">
+                    <i class="fas fa-trash me-1"></i> Delete
+                </a>
+            </div>
+            <!--
+            <div class="movie-description" th:if="${movie.description}">
+                <h5>Description</h5>
+                <p th:text="${movie.description}"></p>
+            </div>-->
+        </div>
+    </div>
+
+    <!--
+    <div class="reviews-section">
+        <h3 class="mb-4">
+            <i class="fas fa-star me-2"></i> Reviews
+            <span class="badge bg-primary rounded-pill" th:text="${movie.reviews.size()}"></span>
+        </h3>
+
+        <div th:if="${movie.reviews.isEmpty()}">
+            <div class="alert alert-info">
+                No reviews yet. Be the first to review this movie!
+            </div>
+        </div>
+
+        <div th:each="review : ${movie.reviews}" class="review-card">
+            <div class="review-header">
+                <a th:href="@{'/profile/' + ${review.user.id}}" class="review-user">
+                    <i class="fas fa-user-circle me-1"></i>
+                    <span th:text="${review.user.username}"></span>
+                </a>
+                <div class="review-rating">
+                    <span th:text="${review.rating}"></span>
+                    <i class="fas fa-star"></i>
+                </div>
+                <span class="review-date" th:text="${#temporals.format(review.createdAt, 'MMM dd, yyyy')}"></span>
+            </div>
+            <div class="review-content">
+                <p th:text="${review.content}"></p>
+            </div>
+        </div>
+    </div>
+
+    <div class="add-review-form" th:unless="${#lists.contains(movie.reviewedBy, #authentication.principal.id)}">
+        <h4 class="mb-4">Add Your Review</h4>
+        <form th:action="@{'/movies/' + ${movie.id} + '/reviews'}" method="post">
+            <div class="star-rating">
+                <i class="fas fa-star" data-rating="1"></i>
+                <i class="fas fa-star" data-rating="2"></i>
+                <i class="fas fa-star" data-rating="3"></i>
+                <i class="fas fa-star" data-rating="4"></i>
+                <i class="fas fa-star" data-rating="5"></i>
+                <input type="hidden" name="rating" id="rating" value="0">
+            </div>
+            <div class="mb-3">
+                    <textarea class="form-control" name="content" rows="4"
+                              placeholder="Write your review..." required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit Review</button>
+        </form>
+    </div>-->
+</div>
+
+<script>
+    document.querySelectorAll('.star-rating i').forEach(star => {
+        star.addEventListener('click', function() {
+            const rating = this.getAttribute('data-rating');
+            document.getElementById('rating').value = rating;
+
+            const stars = this.parentElement.querySelectorAll('i');
+            stars.forEach((s, index) => {
+                if (index < rating) {
+                    s.classList.add('active');
+                } else {
+                    s.classList.remove('active');
+                }
+            });
+        });
+    });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
