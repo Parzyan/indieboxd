@@ -113,13 +113,12 @@
     </div>
 </nav>
 
-<!--
 <div class="container py-4">
     <div class="row">
         <div class="col-lg-4 mb-4">
             <div class="profile-card sticky-top" style="top: 1rem;">
                 <div class="position-relative">
-                    <img th:src="${user.profilePicUrl ?: '/images/default-profile.png'}"
+                    <img th:src="${user.profilePictureUrl ?: 'https://i.pinimg.com/736x/35/5b/0b/355b0b5a1740e0c984bfeddc8c546998.jpg'}"
                          class="profile-pic"
                          alt="Profile picture">
                     <a href="/profile/edit" class="btn btn-sm btn-primary rounded-circle position-absolute"
@@ -132,15 +131,15 @@
 
                 <div class="profile-stats">
                     <div class="stat-item">
-                        <div class="stat-value" th:text="${movieCount}">0</div>
+                        <div class="stat-value" th:text="0">0</div>
                         <div class="stat-label">Movies</div>
                     </div>
                     <div class="stat-item">
-                        <div class="stat-value" th:text="${reviewCount}">0</div>
+                        <div class="stat-value" th:text="0">0</div>
                         <div class="stat-label">Reviews</div>
                     </div>
                     <div class="stat-item">
-                        <div class="stat-value" th:text="${favoriteCount}">0</div>
+                        <div class="stat-value" th:text="0">0</div>
                         <div class="stat-label">Favorites</div>
                     </div>
                 </div>
@@ -171,7 +170,7 @@
                         </ul>
                     </div>
                 </div>
-                <div class="card-body">
+                <!--<div class="card-body">
                     <div th:if="${movies.empty}" class="empty-state">
                         <i class="fas fa-film"></i>
                         <h5>No movies yet</h5>
@@ -204,11 +203,11 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </div>-->
             </div>
         </div>
     </div>
-</div>-->
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
