@@ -5,6 +5,7 @@ import com.company.indieboxd.model.User;
 import com.company.indieboxd.repository.ReviewRepository;
 import com.company.indieboxd.repository.UserRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -70,5 +71,32 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
         return reviewRepository.findByUserId(user.getId());
+    }
+
+    @Transactional
+    public User saveUser(User user) {
+        if(user.getUsername() == null || user.getUsername().trim().isEmpty()) {
+            throw new IllegalArgumentException("Username cannot be empty");
+        }
+        if(user.getEmail() == null || user.getEmail().trim().isEmpty()) {
+            throw new IllegalArgumentException("Email cannot be empty");
+        }
+        return userRepository.save(user);
+    }
+
+    @Transactional
+    public void changePassword(User user, String newPassword) {
+        if (newPassword == null || newPassword.length() < 6) {
+            throw new IllegalArgumentException("Password must be at least 6 characters long");
+        }
+        user.setPassword(newPassword);
+        userRepository.save(user);
+    }
+
+    public boolean checkPassword(User user, String rawPassword) {
+        if (rawPassword == null || rawPassword.isEmpty()) {
+            return false;
+        }
+        return rawPassword == user.getPassword();
     }
 }

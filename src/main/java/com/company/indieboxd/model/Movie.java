@@ -23,6 +23,9 @@ public class Movie {
     @Column(name = "image_url")
     private String imageUrl;
 
+    @Column(name = "streaming_url")
+    private String streamingUrl;
+
     private String description;
     private double rating;
 
@@ -35,6 +38,9 @@ public class Movie {
 
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Review> reviews = new ArrayList<>();
+
+    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Favorite> favorites = new ArrayList<>();
 
     public Movie() {
         this.rating = 0;
@@ -133,4 +139,10 @@ public class Movie {
     public String getDescription() { return description; }
 
     public void setDescription(String description) { this.description = description; }
+
+    public List<Favorite> getFavorites() { return favorites; }
+
+    public String getStreamingUrl() { return streamingUrl; }
+
+    public void setStreamingUrl(String streamingUrl) { this.streamingUrl = streamingUrl; }
 }

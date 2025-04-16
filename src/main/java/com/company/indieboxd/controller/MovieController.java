@@ -3,6 +3,7 @@ package com.company.indieboxd.controller;
 import com.company.indieboxd.model.Movie;
 import com.company.indieboxd.model.Review;
 import com.company.indieboxd.model.User;
+import com.company.indieboxd.service.FavoriteService;
 import com.company.indieboxd.service.MovieService;
 import com.company.indieboxd.service.ReviewService;
 import com.company.indieboxd.service.SessionService;
@@ -22,12 +23,14 @@ public class MovieController {
     private final MovieService movieService;
     private final SessionService sessionService;
     private final ReviewService reviewService;
+    private final FavoriteService favoriteService;
 
     @Autowired
-    public MovieController(MovieService movieService, SessionService sessionService, ReviewService reviewService) {
+    public MovieController(MovieService movieService, SessionService sessionService, ReviewService reviewService, FavoriteService favoriteService) {
         this.movieService = movieService;
         this.sessionService = sessionService;
         this.reviewService = reviewService;
+        this.favoriteService = favoriteService;
     }
 
     @GetMapping("/add")
@@ -107,6 +110,7 @@ public class MovieController {
         boolean hasReviewed = currentUser != null &&
                 reviewService.hasUserReviewedMovie(currentUser.getId(), id);
 
+        model.addAttribute("favoriteService", favoriteService);
         model.addAttribute("movie", movie);
         model.addAttribute("hasReviewed", hasReviewed);
         model.addAttribute("user", currentUser);

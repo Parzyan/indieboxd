@@ -2,6 +2,9 @@ package com.company.indieboxd.model;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "users")
 public class User {
@@ -22,6 +25,9 @@ public class User {
 
     private String bio;
     private String profilePictureUrl;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Favorite> favorites = new ArrayList<>();
 
     public User() {}
 
@@ -81,5 +87,18 @@ public class User {
 
     public void setAdmin(boolean admin) {
         isAdmin = admin;
+    }
+
+    public void addFavorite(Movie movie) {
+        Favorite favorite = new Favorite(this, movie);
+        favorites.add(favorite);
+    }
+
+    public void removeFavorite(Movie movie) {
+        favorites.removeIf(f -> f.getMovie().equals(movie));
+    }
+
+    public List<Favorite> getFavorites() {
+        return favorites;
     }
 }

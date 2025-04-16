@@ -3,6 +3,7 @@ package com.company.indieboxd.service;
 import com.company.indieboxd.model.Movie;
 import com.company.indieboxd.model.Review;
 import com.company.indieboxd.model.User;
+import com.company.indieboxd.repository.FavoriteRepository;
 import com.company.indieboxd.repository.MovieRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -18,9 +19,11 @@ import java.util.Optional;
 public class MovieService {
 
     private final MovieRepository movieRepository;
+    private final FavoriteRepository favoriteRepository;
 
-    public MovieService(MovieRepository movieRepository) {
+    public MovieService(MovieRepository movieRepository, FavoriteRepository favoriteRepository) {
         this.movieRepository = movieRepository;
+        this.favoriteRepository = favoriteRepository;
     }
 
     public List<Movie> getAllMovies() {
@@ -85,5 +88,13 @@ public class MovieService {
 
     public List<Movie> findMoviesByUser(User user) {
         return movieRepository.findByUser(user);
+    }
+
+    public List<Movie> getFavoriteMovies(User user) {
+        return favoriteRepository.findFavoriteMoviesByUser(user);
+    }
+
+    public boolean isMovieFavorite(User user, Movie movie) {
+        return favoriteRepository.existsByUserAndMovie(user, movie);
     }
 }

@@ -150,13 +150,12 @@
         </div>
     </div>
 </nav>
-
 <div class="container py-4">
     <div class="row">
         <div class="col-lg-4 mb-4">
             <div class="profile-card sticky-top" style="top: 1rem;">
                 <div class="position-relative">
-                    <img th:src="${user.profilePictureUrl ?: 'https://i.pinimg.com/736x/35/5b/0b/355b0b5a1740e0c984bfeddc8c546998.jpg'}"
+                    <img th:src="${user.profilePictureUrl ?: '/storage/blank.png'}"
                          class="profile-pic"
                          alt="Profile picture">
                     <a href="/profile/edit" class="btn btn-sm btn-primary rounded-circle position-absolute"
@@ -166,7 +165,7 @@
                 </div>
                 <h3 th:text="${user.username}"></h3>
                 <p class="text-muted mb-3" th:text="${user.email}"></p>
-
+                <p class="mb-3" th:text="${user.bio}" style="font-style: italic; color: #475569;"></p>
                 <div class="profile-stats">
                     <div class="stat-item">
                         <div class="stat-value" th:text="${movies.size()}">0</div>
@@ -177,7 +176,7 @@
                         <div class="stat-label">Reviews</div>
                     </div>
                     <div class="stat-item">
-                        <div class="stat-value" th:text="0">0</div>
+                        <div class="stat-value" th:text="${favorites.size()}">0</div>
                         <div class="stat-label">Favorites</div>
                     </div>
                 </div>
@@ -252,7 +251,6 @@
                         </div>
 
                         <!-- Favorites Tab -->
-                        <!--
                         <div class="tab-pane fade" id="favorites" role="tabpanel">
                             <div th:if="${favorites.empty}" class="empty-state">
                                 <i class="fas fa-heart"></i>
@@ -282,7 +280,7 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>-->
+                        </div>
 
                         <!-- Reviews Tab -->
                         <div class="tab-pane fade" id="reviews" role="tabpanel">
