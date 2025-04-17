@@ -38,4 +38,12 @@ public class ReviewService {
     public boolean hasUserReviewedMovie(Long userId, Long movieId) {
         return reviewRepository.existsByUserIdAndMovieId(userId, movieId);
     }
+
+    public void deleteReview(Long id) {
+        reviewRepository.deleteById(id);
+    }
+
+    public Review getReview(Long id) {
+        return reviewRepository.getOne(id);
+    }
 }

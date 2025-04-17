@@ -45,6 +45,7 @@ public class ProfileController {
         model.addAttribute("favorites", userFavorites);
         model.addAttribute("user", user);
         model.addAttribute("reviews", reviews);
+        model.addAttribute("currentUser", user);
         return "profile";
     }
 
@@ -93,5 +94,26 @@ public class ProfileController {
         }
 
         return "redirect:/profile";
+    }
+
+    @GetMapping("/{username}")
+    public String viewPublicProfile(@PathVariable String username, Model model) {
+        User profileUser = userService.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        User currentUser = sessionService.getCurrentUser();
+        if(currentUser == profileUser) {
+            return "redirect:/profile";
+        }
+
+        List<Movie> userMovies = movieService.findMoviesByUser(profileUser);
+        List<Movie> userFavorites = favoriteService.getUserFavorites(profileUser);
+        List<Review> reviews = userService.getReviewsByUserId(profileUser.getId());
+        model.addAttribute("movies", userMovies);
+        model.addAttribute("favorites", userFavorites);
+        model.addAttribute("user", profileUser);
+        model.addAttribute("reviews", reviews);
+        model.addAttribute("currentUser", currentUser);
+        return "profile";
     }
 }

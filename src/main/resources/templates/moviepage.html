@@ -173,11 +173,34 @@
 
             <div class="mb-3">
                 <span class="text-muted">Added by: </span>
-                <a th:href="@{'/profile/' + ${movie.user.id}}" class="fw-bold">
+                <a th:href="@{'/profile/' + ${movie.user.username}}" class="fw-bold">
                     <i class="fas fa-user me-1"></i>
                     <span th:text="${movie.user.username}"></span>
                 </a>
             </div>
+            <div class="mt-4">
+                <div th:if="${movie.streamingUrl != null}" class="watch-now-section">
+                    <a th:href="${movie.streamingUrl}"
+                       class="btn btn-watch-now"
+                       target="_blank"
+                       rel="noopener noreferrer">
+                        <i class="fas fa-play-circle me-2"></i> Watch Now
+                    </a>
+                    <small class="text-muted d-block mt-2">
+                        <i class="fas fa-external-link-alt me-1"></i> You'll be redirected to the official streaming page
+                    </small>
+                </div>
+
+                <div th:unless="${movie.streamingUrl != null}" class="not-available-section">
+                    <button class="btn btn-secondary" disabled>
+                        <i class="fas fa-video-slash me-2"></i> Streaming Not Available
+                    </button>
+                    <p class="text-muted mt-2">
+                        <i class="fas fa-info-circle me-1"></i> This movie isn't available on any streaming platform yet
+                    </p>
+                </div>
+            </div>
+            <br>
             <div class="movie-description" th:if="${movie.description}">
                 <h5>Description</h5>
                 <p th:text="${movie.description}"></p>

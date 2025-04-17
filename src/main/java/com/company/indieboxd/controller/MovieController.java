@@ -50,6 +50,7 @@ public class MovieController {
             @RequestParam(required = false) Integer releaseYear,
             @RequestParam(required = false) Integer duration,
             @RequestParam(required = false) String genre,
+            @RequestParam(required = false) String streamingUrl,
             @RequestParam(required = false) String description,
             RedirectAttributes redirectAttributes) {
 
@@ -62,6 +63,7 @@ public class MovieController {
         movie.setGenre(genre);
         movie.setUser(currentUser);
         movie.setDescription(description);
+        movie.setStreamingUrl(streamingUrl);
 
         movieService.saveMovie(movie);
 
@@ -116,5 +118,11 @@ public class MovieController {
         model.addAttribute("user", currentUser);
         if(currentUser == null) return "moviepage";
         return "moviepage-logged";
+    }
+
+    @PostMapping("/delete/{movieId}")
+    public String removeMovie(@PathVariable Long movieId) {
+        movieService.deleteMovie(movieId);
+        return "redirect:/profile";
     }
 }

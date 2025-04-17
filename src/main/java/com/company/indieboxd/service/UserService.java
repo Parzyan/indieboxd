@@ -1,5 +1,6 @@
 package com.company.indieboxd.service;
 
+import com.company.indieboxd.model.Movie;
 import com.company.indieboxd.model.Review;
 import com.company.indieboxd.model.User;
 import com.company.indieboxd.repository.ReviewRepository;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -98,5 +100,10 @@ public class UserService {
             return false;
         }
         return rawPassword == user.getPassword();
+    }
+
+    public Optional<User> findByUsername(String username) {
+        Optional<User> user = Optional.ofNullable(userRepository.findByUsername(username));
+        return user;
     }
 }

@@ -12,6 +12,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 import java.util.Optional;
 
@@ -47,8 +49,12 @@ public class MovieService {
         movieRepository.save(movie);
     }
 
-    public void saveMovie(Movie movie) {
-        movieRepository.save(movie);
+    @Transactional
+    public Movie saveMovie(Movie movie) {
+        if (movie.getStreamingUrl() != null && !movie.getStreamingUrl().isEmpty()) {
+            validateStreamingUrl(movie.getStreamingUrl());
+        }
+        return movieRepository.save(movie);
     }
 
     public void deleteMovie(Long id) {
@@ -96,5 +102,16 @@ public class MovieService {
 
     public boolean isMovieFavorite(User user, Movie movie) {
         return favoriteRepository.existsByUserAndMovie(user, movie);
+    }
+
+    private void validateStreamingUrl(String url) {
+        try {
+            new URL(url);
+            if (!url.startsWith("https://")) {
+                throw new IllegalArgumentException("Streaming URL must use HTTPS");
+            }
+        } catch (MalformedURLException e) {
+            throw new IllegalArgumentException("Invalid streaming URL format");
+        }
     }
 }

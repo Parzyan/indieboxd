@@ -144,7 +144,7 @@
             <a href="/movies" class="nav-link">Browse Movies</a>
             <a href="/profile" class="nav-link active">
                 <i class="fas fa-user-circle me-1"></i>
-                <span th:text="${user.username}"></span>
+                <span th:text="${currentUser.username}"></span>
             </a>
             <a href="/auth/logout" class="nav-link">Logout</a>
         </div>
@@ -181,7 +181,7 @@
                     </div>
                 </div>
 
-                <div class="d-grid gap-2">
+                <div class="d-grid gap-2" th:if="${currentUser.id == user.id or currentUser.isAdmin()}">
                     <a href="/movies/add" class="btn btn-primary">
                         <i class="fas fa-plus me-2"></i> Add Movie
                     </a>
@@ -217,9 +217,8 @@
                     </ul>
 
                     <div class="tab-content" id="profileTabsContent">
-                        <!-- Movies Tab -->
                         <div class="tab-pane fade show active" id="movies" role="tabpanel">
-                            <div th:if="${movies.isEmpty()}" class="empty-state">
+                            <div th:if="${movies.isEmpty() and (currentUser.id == user.id or currentUser.isAdmin())}" class="empty-state">
                                 <i class="fas fa-film"></i>
                                 <h5>No movies added yet</h5>
                                 <p class="text-muted">You haven't added any movies to your collection.</p>
@@ -229,7 +228,7 @@
                             </div>
 
                             <div th:each="movie : ${movies}" class="movie-card">
-                                <img th:src="${movie.imageUrl ?: 'https://image.tmdb.org/t/p/w600_and_h900_bestv2/7IiTTgloJzvGI1TAYymCfbfl3vT.jpg'}"
+                                <img th:src="${movie.imageUrl ?: ''}"
                                      class="movie-poster"
                                      th:alt="${movie.title + ' poster'}">
                                 <div class="movie-details">
@@ -240,7 +239,8 @@
                                         <a th:href="@{'/movies/' + ${movie.id}}" class="btn btn-sm btn-outline-primary">
                                             <i class="fas fa-eye"></i> View
                                         </a>
-                                        <form th:action="@{'/movies/delete/' + ${movie.id}}" method="post" class="d-inline">
+                                        <form th:action="@{'/movies/delete/' + ${movie.id}}" method="post" class="d-inline"
+                                              th:if="${currentUser.id == user.id or currentUser.isAdmin()}">
                                             <button type="submit" class="btn btn-sm btn-outline-danger">
                                                 <i class="fas fa-trash"></i> Delete
                                             </button>
@@ -250,9 +250,8 @@
                             </div>
                         </div>
 
-                        <!-- Favorites Tab -->
                         <div class="tab-pane fade" id="favorites" role="tabpanel">
-                            <div th:if="${favorites.empty}" class="empty-state">
+                            <div th:if="${favorites.isEmpty() and (currentUser.id == user.id or currentUser.isAdmin())}" class="empty-state">
                                 <i class="fas fa-heart"></i>
                                 <h5>No favorites yet</h5>
                                 <p class="text-muted">You haven't added any movies to your favorites.</p>
@@ -272,7 +271,8 @@
                                         <a th:href="@{'/movies/' + ${movie.id}}" class="btn btn-sm btn-outline-primary">
                                             <i class="fas fa-eye"></i> View
                                         </a>
-                                        <form th:action="@{'/favorites/remove/' + ${movie.id}}" method="post" class="d-inline">
+                                        <form th:action="@{'/favorites/remove/' + ${movie.id}}" method="post" class="d-inline"
+                                              th:if="${currentUser.id == user.id or currentUser.isAdmin()}">
                                             <button type="submit" class="btn btn-sm btn-outline-danger">
                                                 <i class="fas fa-heart-broken"></i> Remove
                                             </button>
@@ -282,9 +282,8 @@
                             </div>
                         </div>
 
-                        <!-- Reviews Tab -->
                         <div class="tab-pane fade" id="reviews" role="tabpanel">
-                            <div th:if="${reviews.isEmpty()}" class="empty-state">
+                            <div th:if="${reviews.isEmpty() and (currentUser.id == user.id or currentUser.isAdmin())}" class="empty-state">
                                 <i class="fas fa-star"></i>
                                 <h5>No reviews yet</h5>
                                 <p class="text-muted">You haven't reviewed any movies yet.</p>
@@ -303,7 +302,7 @@
                                 </div>
                                 <p th:text="${review.content}"></p>
                                 <div class="review-date" th:text="${#temporals.format(review.createdAt, 'MMM dd, yyyy')}"></div>
-                                <div class="mt-2">
+                                <div class="mt-2" th:if="${currentUser.id == user.id or currentUser.isAdmin()}">
                                     <form th:action="@{'/reviews/delete/' + ${review.id}}" method="post" class="d-inline">
                                         <button type="submit" class="btn btn-sm btn-outline-danger">
                                             <i class="fas fa-trash"></i> Delete

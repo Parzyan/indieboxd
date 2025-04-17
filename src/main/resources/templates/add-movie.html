@@ -139,6 +139,13 @@
                             <option>Animation</option>
                         </select>
                     </div>
+                    <div class="mb-3">
+                        <label for="streamingUrl" class="form-label fw-bold">Streaming Link</label>
+                        <input type="url" class="form-control" id="streamingUrl" name="streamingUrl"
+                               placeholder="https://netflix.com/watch/..."
+                               th:value="${movie?.streamingUrl}">
+                        <small class="text-muted">Link where users can watch this movie</small>
+                    </div>
                     <div class="mb-4">
                         <label class="form-label fw-bold">Description</label>
                         <textarea class="form-control" name="description" rows="4"
@@ -159,16 +166,6 @@
 </div>
 
 <script>
-    function updatePreview(url) {
-        const preview = document.getElementById('imagePreview');
-        if (url && isValidUrl(url)) {
-            preview.src = url;
-            preview.style.display = 'block';
-        } else {
-            preview.style.display = 'none';
-        }
-    }
-
     function isValidUrl(string) {
         try {
             new URL(string);
