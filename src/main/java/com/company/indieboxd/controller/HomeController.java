@@ -3,8 +3,7 @@ package com.company.indieboxd.controller;
 import com.company.indieboxd.model.Movie;
 import com.company.indieboxd.model.User;
 import com.company.indieboxd.repository.MovieRepository;
-import com.company.indieboxd.service.MovieService;
-import com.company.indieboxd.service.SessionService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,17 +16,15 @@ import java.util.stream.Collectors;
 public class HomeController {
 
     private final MovieRepository movieRepository;
-    private final SessionService sessionService;
 
     @Autowired
-    public HomeController(MovieRepository movieRepository, SessionService sessionService) {
+    public HomeController(MovieRepository movieRepository) {
         this.movieRepository = movieRepository;
-        this.sessionService = sessionService;
     }
 
     @GetMapping("/")
-    public String home(Model model) {
-        User user = sessionService.getCurrentUser();
+    public String home(Model model, HttpSession session) {
+        User user = (User) session.getAttribute("currentUser");
         if (user == null) {
             List<Movie> movies = movieRepository.findAll();
             List<Movie> firstTwelveMovies = movies.stream().limit(12).collect(Collectors.toList());

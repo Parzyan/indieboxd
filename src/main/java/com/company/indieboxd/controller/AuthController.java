@@ -1,8 +1,8 @@
 package com.company.indieboxd.controller;
 
 import com.company.indieboxd.model.User;
-import com.company.indieboxd.service.SessionService;
 import com.company.indieboxd.service.UserService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,11 +14,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RequestMapping("/auth")
 public class AuthController {
     private final UserService userService;
-    private final SessionService sessionService;
 
-    public AuthController(UserService userService, SessionService sessionService) {
+    public AuthController(UserService userService) {
         this.userService = userService;
-        this.sessionService = sessionService;
     }
 
     @GetMapping("/signup")
@@ -64,11 +62,12 @@ public class AuthController {
     public String login(
             @RequestParam String username,
             @RequestParam String password,
-            Model model) {
+            Model model,
+            HttpSession session) {
 
         User user = userService.login(username, password);
         if (user != null) {
-            sessionService.login(user);
+            session.setAttribute("currentUser", user);
             if(user.isAdmin()) return "redirect:/admin/dashboard";
             else return "redirect:/profile";
         }
@@ -77,8 +76,8 @@ public class AuthController {
     }
 
     @GetMapping("/logout")
-    public String logout(Model model) {
-        sessionService.logout();
+    public String logout(Model model, HttpSession session) {
+        session.invalidate();
         return "redirect:/";
     }
 }

@@ -11,12 +11,10 @@ import org.springframework.transaction.annotation.Transactional;
 public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final MovieService movieService;
-    private final SessionService sessionService;
 
-    public ReviewService(ReviewRepository reviewRepository, MovieService movieService, SessionService sessionService) {
+    public ReviewService(ReviewRepository reviewRepository, MovieService movieService) {
         this.reviewRepository = reviewRepository;
         this.movieService = movieService;
-        this.sessionService = sessionService;
     }
 
     @Transactional

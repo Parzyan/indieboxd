@@ -4,6 +4,7 @@ import com.company.indieboxd.model.Movie;
 import com.company.indieboxd.model.Review;
 import com.company.indieboxd.model.User;
 import com.company.indieboxd.service.*;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -16,15 +17,13 @@ import java.util.List;
 @Controller
 @RequestMapping("/profile")
 public class ProfileController {
-    private final SessionService sessionService;
     private final UserService userService;
     private final ReviewService reviewService;
     private final MovieService movieService;
     private final StorageService storageService;
     private final FavoriteService favoriteService;
 
-    public ProfileController(SessionService sessionService, UserService userService, ReviewService reviewService, MovieService movieService, StorageService storageService, FavoriteService favoriteService) {
-        this.sessionService = sessionService;
+    public ProfileController(UserService userService, ReviewService reviewService, MovieService movieService, StorageService storageService, FavoriteService favoriteService) {
         this.userService = userService;
         this.reviewService = reviewService;
         this.movieService = movieService;
@@ -33,8 +32,8 @@ public class ProfileController {
     }
 
     @GetMapping
-    public String profile(Model model) {
-        User user = sessionService.getCurrentUser();
+    public String profile(Model model, HttpSession session) {
+        User user = (User) session.getAttribute("currentUser");
         if (user == null) {
             return "redirect:/auth/login";
         }
@@ -50,8 +49,8 @@ public class ProfileController {
     }
 
     @GetMapping("/edit")
-    public String showEditProfileForm(Model model) {
-        User user = sessionService.getCurrentUser();
+    public String showEditProfileForm(Model model, HttpSession session) {
+        User user = (User) session.getAttribute("currentUser");
         model.addAttribute("user", user);
         if(user == null) { return "redirect:/auth/login"; }
         return "edit-profile";
@@ -64,10 +63,11 @@ public class ProfileController {
             @RequestParam(required = false) String currentPassword,
             @RequestParam(required = false) String newPassword,
             @RequestParam(required = false) MultipartFile profilePic,
-            RedirectAttributes redirectAttributes) {
+            RedirectAttributes redirectAttributes,
+            HttpSession session) {
 
         try {
-            User currentUser = sessionService.getCurrentUser();
+            User currentUser = (User) session.getAttribute("currentUser");
 
             if (email != null) currentUser.setEmail(email);
             if (bio != null) currentUser.setBio(bio);
@@ -97,11 +97,11 @@ public class ProfileController {
     }
 
     @GetMapping("/{username}")
-    public String viewPublicProfile(@PathVariable String username, Model model) {
+    public String viewPublicProfile(@PathVariable String username, Model model, HttpSession session) {
         User profileUser = userService.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-        User currentUser = sessionService.getCurrentUser();
+        User currentUser = (User) session.getAttribute("currentUser");
         if(currentUser == profileUser) {
             return "redirect:/profile";
         }

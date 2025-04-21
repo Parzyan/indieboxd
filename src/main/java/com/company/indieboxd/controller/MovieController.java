@@ -1,12 +1,11 @@
 package com.company.indieboxd.controller;
 
 import com.company.indieboxd.model.Movie;
-import com.company.indieboxd.model.Review;
 import com.company.indieboxd.model.User;
 import com.company.indieboxd.service.FavoriteService;
 import com.company.indieboxd.service.MovieService;
 import com.company.indieboxd.service.ReviewService;
-import com.company.indieboxd.service.SessionService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
@@ -21,21 +20,19 @@ import java.util.List;
 public class MovieController {
 
     private final MovieService movieService;
-    private final SessionService sessionService;
     private final ReviewService reviewService;
     private final FavoriteService favoriteService;
 
     @Autowired
-    public MovieController(MovieService movieService, SessionService sessionService, ReviewService reviewService, FavoriteService favoriteService) {
+    public MovieController(MovieService movieService, ReviewService reviewService, FavoriteService favoriteService) {
         this.movieService = movieService;
-        this.sessionService = sessionService;
         this.reviewService = reviewService;
         this.favoriteService = favoriteService;
     }
 
     @GetMapping("/add")
-    public String showAddForm(Model model) {
-        User user = sessionService.getCurrentUser();
+    public String showAddForm(Model model, HttpSession session) {
+        User user = (User) session.getAttribute("currentUser");
         if (user == null) {
             return "redirect:/auth/login";
         }
@@ -52,9 +49,10 @@ public class MovieController {
             @RequestParam(required = false) String genre,
             @RequestParam(required = false) String streamingUrl,
             @RequestParam(required = false) String description,
-            RedirectAttributes redirectAttributes) {
+            RedirectAttributes redirectAttributes,
+            HttpSession session) {
 
-        User currentUser = sessionService.getCurrentUser();
+        User currentUser = (User) session.getAttribute("currentUser");
         Movie movie = new Movie();
         movie.setTitle(title);
         movie.setImageUrl(imageUrl);
@@ -72,11 +70,11 @@ public class MovieController {
     }
 
     @GetMapping("/confirmation")
-    public String showConfirmation(Model model) {
+    public String showConfirmation(Model model, HttpSession session) {
         if (!model.containsAttribute("movie")) {
             return "redirect:/movies/add";
         }
-        User user = sessionService.getCurrentUser();
+        User user = (User) session.getAttribute("currentUser");
         model.addAttribute("user", user);
         return "confirmation";
     }
@@ -87,12 +85,13 @@ public class MovieController {
             @RequestParam(defaultValue = "5") int size,
             @RequestParam(required = false) String genre,
             @RequestParam(defaultValue = "newest") String sort,
-            Model model) {
+            Model model,
+            HttpSession session) {
 
         Page<Movie> moviePage = movieService.findMovies(page, size, genre, sort);
         List<String> allGenres = movieService.findAllGenres();
 
-        User user = sessionService.getCurrentUser();
+        User user = (User) session.getAttribute("currentUser");
         model.addAttribute("movies", moviePage);
         model.addAttribute("allGenres", allGenres);
         model.addAttribute("selectedGenre", genre);
@@ -104,11 +103,11 @@ public class MovieController {
     }
 
     @GetMapping("/{id}")
-    public String viewMovie(@PathVariable Long id, Model model) {
+    public String viewMovie(@PathVariable Long id, Model model, HttpSession session) {
         Movie movie = movieService.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Movie not found"));
 
-        User currentUser = sessionService.getCurrentUser();
+        User currentUser = (User) session.getAttribute("currentUser");
         boolean hasReviewed = currentUser != null &&
                 reviewService.hasUserReviewedMovie(currentUser.getId(), id);
 
